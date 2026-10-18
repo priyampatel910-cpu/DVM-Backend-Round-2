@@ -1,5 +1,5 @@
 """
-URL configuration for eventconfig project.
+URL configuration for events project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -19,6 +19,5 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('events/', include('eventsbooking.urls')),
-    path('users/', include('users.urls'))
+    path('user/', include('users.urls'))
 ]
