@@ -3,7 +3,7 @@
 {% block content %}
     
 
-    <form class="form" action="{% url 'login' %}" method="POST">
+    <form class="form" action="{% url 'users:login' %}" method="POST">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username">
         <input type="password" name="password" placeholder="Password">
@@ -12,6 +12,6 @@
 
     <div>
         New User?
-        <a href="{% url 'signup' %}">Create New Account</a>
+        <a href="{% url 'users:signup' %}">Create New Account</a>
     </div>
 {% endblock %}

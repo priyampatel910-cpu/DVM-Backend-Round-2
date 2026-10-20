@@ -113,12 +113,12 @@
         {% if user.is_authenticated %}
           <a href="/bookings/">My bookings</a>
           <span class="muted">{{ user.username }}</span>
-          <form method="post" action="{% url 'logout' %}">
+          <form method="post" action="{% url 'users:logout' %}">
             {% csrf_token %}
             <button class="btn-link" type="submit">Log out</button>
           </form>
         {% else %}
-          <a class="btn" href="{% url 'login' %}">Log in</a>
+          <a class="btn" href="{% url 'users:login' %}">Log in</a>
         {% endif %}
       </nav>
     </div>

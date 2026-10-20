@@ -5,6 +5,7 @@ from users.models import User
 
 class Event(models.Model):
     name = models.CharField()
+    category = models.CharField(null=True, blank=True, default=None)
     venue = models.CharField()
     datetime = models.DateTimeField()
     ticketprice = models.IntegerField()

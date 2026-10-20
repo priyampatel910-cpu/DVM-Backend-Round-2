@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Events</h1>
+  <div class="grid">
+    {% for event in events %}
+      <article class="ticket">
+        <div class="ticket-body">
+          <span class="badge">{{ event.category }}</span>
+          <h3>{{ event.name }}</h3>
+          <p>{{ event.datetime }} at {{ event.venue }}</p>
+        </div>
+        <div class="ticket-stub">
+          <span class="price">Rs. {{ event.ticketprice }}</span>
+          <a class="btn" href="/events/{{ event.id }}/book/">Book</a>
+        </div>
+      </article>
+    {% empty %}
+      <p class="muted">No events right now. Check back soon.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
