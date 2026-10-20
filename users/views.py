@@ -22,21 +22,31 @@ def login_view(request):
 
 def signup_view(request):
     if request.method == "POST":
-        form = CustomAdminUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('home')
         
-        else:
-            return render(request, 'signup.html', {
-                'message' : 'Invalid Credentials!'
-            })
-    return render(request, 'signup.html')
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'signup.html', {
+        'form' : form,
+    })
 
 def home(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return render(request, 'user_homepage.html')
     
     else:
         return render(request, 'homepage.html')
+
+def homeredirect(request):
+    return redirect('home')
+
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+
+    return redirect('home')
