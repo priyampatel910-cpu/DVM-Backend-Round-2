@@ -46,7 +46,7 @@
     </div>
 
     <div class="placeholder">
-        <img src="{% static 'images/banner(1).jpg' %}" width="600" height="600g" alt="Crowd at a live concert">
+        <img src="{% static 'images/banner(1).jpg' %}" width="600" height="500" alt="Crowd at a live concert" style="border-radius: 30px;">
     </div>
   </section>
 
@@ -59,25 +59,26 @@
 
     <div class="grid">
       <article class="category">
-        {# IMAGE (movies): the inside of a cinema, with rows of dark seats facing
-           a lit screen, or a projector beam in a dim room. #}
-        <div class="placeholder"></div>
+        <div class="placeholder">
+          <img src="{% static 'images/movies.jpg' %}" width="342" height="255" style="border-radius: 15px;">
+        </div>
         <h3>Movies</h3>
         <p>New releases and favorites on the big screen.</p>
       </article>
 
       <article class="category">
-        {# IMAGE (shows): a theatre or concert stage with a single spotlight
-           and curtains, or an audience seen from behind. #}
-        <div class="placeholder"></div>
+
+        <div class="placeholder">
+          <img src="{% static 'images/live.jpg' %}" width="342" height="255" style="border-radius: 15px;">
+        </div>
         <h3>Shows</h3>
         <p>Concerts, plays and live performances.</p>
       </article>
 
       <article class="category">
-        {# IMAGE (sports): a stadium under floodlights at dusk, or a wide shot
-           of a ground full of fans. Avoid close-ups of individual players. #}
-        <div class="placeholder"></div>
+        <div class="placeholder">
+          <img src="{% static 'images/sports.jpg' %}" width="342" height="255" style="border-radius: 15px;">
+        </div>
         <h3>Sports</h3>
         <p>Matches and tournaments, live and in person.</p>
       </article>

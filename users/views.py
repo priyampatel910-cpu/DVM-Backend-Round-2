@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
+from booking.models import Event
 
 def login_view(request):
     if request.method =="POST":
@@ -37,7 +38,10 @@ def signup_view(request):
 
 def home(request):
     if request.user.is_authenticated:
-        return render(request, 'user_homepage.html')
+        events = request.user.events.all()
+        return render(request, 'user_homepage.html', {
+            'events' : events,
+        })
     
     else:
         return render(request, 'homepage.html')

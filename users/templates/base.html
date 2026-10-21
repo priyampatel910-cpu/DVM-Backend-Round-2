@@ -61,7 +61,7 @@
     .btn-link { background: none; border: 0; padding: 0; cursor: pointer; color: var(--muted); font: 500 1rem var(--font-body); }
     .btn-link:hover { color: var(--text); }
 
-    /* ===== Event ticket card ===== */
+    /* ===== Ticket shape (used only on the booking page) ===== */
     .ticket { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
     .ticket-body { flex: 1; padding: 1.1rem 1.25rem; }
     .ticket-body h3 { margin-bottom: .35rem; }
@@ -75,6 +75,18 @@
     .price { font: 700 1.2rem var(--font-head); }
     .badge { display: inline-block; margin-bottom: .6rem; padding: .15rem .6rem; border-radius: 999px;
              background: var(--soft); color: var(--primary); font-size: .8rem; font-weight: 600; }
+
+    /* ===== Event card (used on the events list) ===== */
+    .event-card { display: flex; flex-direction: column; overflow: hidden; background: var(--surface);
+                  border: 1px solid var(--line); border-radius: 12px; transition: border-color .15s, box-shadow .15s; }
+    .event-card:hover { border-color: var(--primary); box-shadow: 0 6px 18px rgba(18, 22, 31, .07); }
+    .event-card-image { aspect-ratio: 16 / 10; background: var(--soft); }
+    .event-card-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .event-card-body { flex: 1; padding: 1.1rem 1.25rem; }
+    .event-card-body h3 { margin: 0 0 .6rem; }
+    .event-info { display: grid; gap: .2rem; margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: .92rem; }
+    .event-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+                         padding: .9rem 1.25rem; border-top: 1px solid var(--line); }
 
     /* ===== Messages (e.g. "Booking confirmed!") ===== */
     .alert { margin-bottom: 1rem; padding: .8rem 1rem; border-radius: 10px; font-weight: 500; background: var(--soft); color: var(--primary); }
@@ -104,11 +116,11 @@
 <body>
   <header class="site-header">
     <div class="container bar">
-      <a class="brand" href="/">Evently</a>
+      <a class="brand" href="{% url 'users:home' %}">Evently</a>
 
       <nav class="nav">
         {# Change these addresses to match your own pages #}
-        <a href="/events/">Events</a>
+        <a href="{% url 'booking:events_index' %}">Events</a>
 
         {% if user.is_authenticated %}
           <a href="/bookings/">My bookings</a>

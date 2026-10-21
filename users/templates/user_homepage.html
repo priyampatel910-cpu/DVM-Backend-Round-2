@@ -10,4 +10,14 @@
     <div>
         <a href="{% url 'booking:events_index' %}">View events</a>
     </div>
+    <div>
+        <h3>My events</h3>
+        <ul>
+            {% for event in events %}
+                <li> {{event.name}} </li>
+            {% empty %}
+                <li>No events booked.</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}

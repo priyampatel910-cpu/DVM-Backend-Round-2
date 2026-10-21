@@ -45,16 +45,9 @@
   <div class="booking">
 
     {# ===== Left side: all the event details ===== #}
-    <section>
-      {# IMAGE: the poster or photo the organizer uploaded for this event #}
-      <div class="event-image">
-        {% if event.image %}
-          <img src="{{ event.image.url }}" alt="{{ event.title }}">
-        {% endif %}
-      </div>
-
+    <section class="ticket-body">
       <span class="badge">{{ event.category }}</span>
-      <h1>{{ event.title }}</h1>
+      <h1>{{ event.name }}</h1>
 
       <dl class="details">
         <dt>Date</dt>
@@ -74,7 +67,6 @@
       <p class="description">{{ event.description|linebreaksbr }}</p>
     </section>
 
-    {# ===== Right side: who is booking, wallet, and the confirm button ===== #}
     <aside class="summary">
       <form method="post" class="ticket">
         {% csrf_token %}
@@ -103,13 +95,15 @@
             </div>
           </dl>
 
-          {% if message %}
+          {% if is_already_booked %}
             <div class="alert alert-warning" style="margin: 1rem 0 0;">
-              {{ error_message }}
+              You already have a ticket for this event.
+              <a href="/bookings/">View my bookings</a>
             </div>
-          {% elif insufficient_funding %}
+          {% elif user.balance < event.price %}
             <div class="alert alert-error" style="margin: 1rem 0 0;">
-              {{ insufficient_funding }}
+              Your wallet balance is too low for this ticket.
+              {# Change /wallet/ to the page where users add money #}
               <a href="/wallet/">Add money</a>
             </div>
           {% else %}
@@ -122,7 +116,7 @@
             <span class="total-label">Total</span>
             <span class="price">{{ event.price }}</span>
           </div>
-          <button class="btn" type="submit" {% if already_booked or wallet.balance < event.price %}disabled{% endif %}>
+          <button class="btn" type="submit" {% if is_already_booked or wallet.balance < event.price %}disabled{% endif %}>
             Confirm booking
           </button>
         </div>
