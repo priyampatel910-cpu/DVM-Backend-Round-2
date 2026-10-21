@@ -10,9 +10,9 @@ class CustomAdminUserCreationForm(AdminUserCreationForm):
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + ('balance',)
+        fields = UserCreationForm.Meta.fields + ('balance','first_name', 'last_name', 'email',)
 
 class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = User
-        fields = ('username', 'balance')
+        fields = ('balance', 'first_name', 'last_name', 'email',)

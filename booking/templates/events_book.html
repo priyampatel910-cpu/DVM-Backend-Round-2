@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ event.title }}{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Styles used only on this page */
+    .back { display: inline-block; margin-bottom: 1.5rem; color: var(--muted); text-decoration: none; font-weight: 500; }
+    .back:hover { color: var(--text); }
+
+    .booking { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 2.5rem; align-items: start; }
+    @media (max-width: 800px) { .booking { grid-template-columns: 1fr; } }
+
+    /* Event image (shows an empty soft box if the event has no image) */
+    .event-image { aspect-ratio: 16 / 9; margin-bottom: 1.5rem; background: var(--soft); border-radius: 14px; overflow: hidden; }
+    .event-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    /* Event details list */
+    .details { display: grid; grid-template-columns: 6.5rem 1fr; gap: .6rem 1rem; margin: 1.5rem 0; padding: 1.25rem 0;
+               border-block: 1px solid var(--line); }
+    .details dt { color: var(--muted); }
+    .details dd { margin: 0; font-weight: 500; }
+    .description { color: var(--muted); }
+
+    /* Booking summary (right side) */
+    .summary { position: sticky; top: 1.5rem; }
+    .summary .ticket-body { padding: 1.5rem; }
+    .rows { margin: 1rem 0 0; }
+    .row { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid var(--line); }
+    .row dt { color: var(--muted); }
+    .row dd { margin: 0; font-weight: 500; text-align: right; overflow-wrap: anywhere; }
+    .row.wallet { border-bottom: 0; }
+    .row.wallet dd { font: 700 1.2rem var(--font-head); }
+    .note { margin: 1rem 0 0; color: var(--muted); font-size: .9rem; }
+    .summary .ticket-stub { padding: 1.25rem 1.5rem; }
+    .total-label { display: block; color: var(--muted); font-size: .85rem; }
+    .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .btn[disabled]:hover { background: var(--primary); }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <a class="back" href="{% url 'booking:events_index' %}">← Back to events</a>
+
+  <div class="booking">
+
+    {# ===== Left side: all the event details ===== #}
+    <section>
+      {# IMAGE: the poster or photo the organizer uploaded for this event #}
+      <div class="event-image">
+        {% if event.image %}
+          <img src="{{ event.image.url }}" alt="{{ event.title }}">
+        {% endif %}
+      </div>
+
+      <span class="badge">{{ event.category }}</span>
+      <h1>{{ event.title }}</h1>
+
+      <dl class="details">
+        <dt>Date</dt>
+        <dd>{{ event.datetime }}</dd>
+
+        <dt>Venue</dt>
+        <dd>{{ event.venue }}</dd>
+
+        <dt>Organizer</dt>
+        <dd>{{ event.organizer }}</dd>
+
+        <dt>Ticket price</dt>
+        <dd>₹ {{ event.ticketprice }}</dd>
+      </dl>
+
+      <h2>About this event</h2>
+      <p class="description">{{ event.description|linebreaksbr }}</p>
+    </section>
+
+    {# ===== Right side: who is booking, wallet, and the confirm button ===== #}
+    <aside class="summary">
+      <form method="post" class="ticket">
+        {% csrf_token %}
+
+        <div class="ticket-body">
+          <h3>Your booking</h3>
+
+          <dl class="rows">
+            <div class="row">
+              <dt>Name</dt>
+              <dd>{{ user.get_full_name|default:user.username }}</dd>
+            </div>
+            <div class="row">
+              <dt>Username</dt>
+              <dd>{{ user.username }}</dd>
+            </div>
+            {% if user.email %}
+              <div class="row">
+                <dt>Email</dt>
+                <dd>{{ user.email }}</dd>
+              </div>
+            {% endif %}
+            <div class="row wallet">
+              <dt>Wallet balance</dt>
+              <dd>{{ user.balance }}</dd>
+            </div>
+          </dl>
+
+          {% if message %}
+            <div class="alert alert-warning" style="margin: 1rem 0 0;">
+              {{ error_message }}
+            </div>
+          {% elif insufficient_funding %}
+            <div class="alert alert-error" style="margin: 1rem 0 0;">
+              {{ insufficient_funding }}
+              <a href="/wallet/">Add money</a>
+            </div>
+          {% else %}
+            <p class="note">One ticket per account. The price will be taken from your wallet when you confirm.</p>
+          {% endif %}
+        </div>
+
+        <div class="ticket-stub">
+          <div>
+            <span class="total-label">Total</span>
+            <span class="price">{{ event.price }}</span>
+          </div>
+          <button class="btn" type="submit" {% if already_booked or wallet.balance < event.price %}disabled{% endif %}>
+            Confirm booking
+          </button>
+        </div>
+      </form>
+    </aside>
+
+  </div>
+{% endblock %}

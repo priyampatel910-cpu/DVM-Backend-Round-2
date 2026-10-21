@@ -4,15 +4,15 @@
     <h1>Events</h1>
   <div class="grid">
     {% for event in events %}
-      <article class="ticket">
-        <div class="ticket-body">
-          <span class="badge">{{ event.category }}</span>
-          <h3>{{ event.name }}</h3>
-          <p>{{ event.datetime }} at {{ event.venue }}</p>
-        </div>
+      <article class="category">
+        <div class="placeholder"></div>
+        <span class="badge"> {{ event.category }} </span>
+        <h3> {{ event.name }} </h3>
+        <p> {{event.datetime}} at {{event.venue}} </p>
+
         <div class="ticket-stub">
-          <span class="price">Rs. {{ event.ticketprice }}</span>
-          <a class="btn" href="/events/{{ event.id }}/book/">Book</a>
+          <span class="price"> Rs. {{ event.ticketprice }}</span>
+          <a class="btn" href="{% url 'booking:events_book' event.id %}">Book</a>
         </div>
       </article>
     {% empty %}
