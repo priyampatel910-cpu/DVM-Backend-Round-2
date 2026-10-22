@@ -13,4 +13,4 @@ class CustomUserAdmin(UserAdmin):
         ("Balance", {"fields": ("balance",)}),
     )
 
-admin.site.register(User, CustomUserAdmin)   
+admin.site.register(User, CustomUserAdmin)

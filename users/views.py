@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
-from booking.models import Event, Booking
+from booking.models import *
+from django.db import transaction
 
 def login_view(request):
     if request.method =="POST":
@@ -44,7 +45,6 @@ def home(request):
             'events' : events,
             'transactions' : transactions
         })
-    
     else:
         return render(request, 'homepage.html')
 
@@ -56,3 +56,24 @@ def logout_view(request):
         logout(request)
 
     return redirect('users:home')
+
+def addmoney(request):
+    if request.method == "POST":
+        added_balance = request.POST['addeed_balance']
+
+        with transactions.atomic():
+            selected_user = User.objects.select_for_update().get(id=request.user.id)
+
+            if added_balance<=0:
+                return render(request, 'addmoney.html',{
+                    'error_msg' : "Error: You must add a valid balance to proceed"
+                })
+
+            selected_user.balance += added_balance
+            selected_user.save(update_fields=['balance'])
+
+            Transaction.objects.create(user=request.user, description="Added to wallet", change=added_balance)
+
+            return redirect('users:add_success')
+
+    return render(request, 'addmoney.html')

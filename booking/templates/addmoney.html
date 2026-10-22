@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Add money to your wallet</h1>
+<div>Current balance: Rs. {{user.balance}} </div>
+
+{% if error_msg %}
+    <p> {{ error_msg }} </p>
+{% endif %}
+
+<form action="{% url 'users:addmoney' %}" request="POST">
+    <input type="number" name="added_balance" placeholder="Enter the amount you want to add">
+    <input type="submit" name="Add">    
+</form>
+
+<a href="{% url 'users:home' %}">Go back to dashboard</a>
+{% endblock %}

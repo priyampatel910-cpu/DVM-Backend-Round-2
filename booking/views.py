@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Event, Booking
+from .models import *
 from django.db import transaction
 
 # Create your views here.
@@ -51,6 +51,7 @@ def events_book(request, event_id):
             selected_event.save(update_fields=['available_slots'])
 
             Booking.objects.create(user=user, event=event)
+            Transaction.objects.create(user=user, description=selected_event.name, change= -selected_event.ticketprice)
 
             return redirect('booking:booking_success')
 

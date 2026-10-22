@@ -22,4 +22,12 @@ class Booking(models.Model):
     booked_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{user.username} booked {event.name}"
+        return f"{self.user.first_name} booked {self.event.name}"
+
+class Transaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    description  =  models.CharField()
+    change = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user.first_name}'s account balance change: {self.change} "
