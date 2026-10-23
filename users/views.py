@@ -39,11 +39,8 @@ def signup_view(request):
 
 def home(request):
     if request.user.is_authenticated:
-        events = request.user.events.all()
-        transactions = request.user.bookings.all()
         return render(request, 'user_homepage.html', {
-            'events' : events,
-            'transactions' : transactions
+
         })
     else:
         return render(request, 'homepage.html')
@@ -58,10 +55,13 @@ def logout_view(request):
     return redirect('users:home')
 
 def addmoney(request):
-    if request.method == "POST":
-        added_balance = request.POST['addeed_balance']
+    if not request.user.is_authenticated:
+        return redirect('users:login')
 
-        with transactions.atomic():
+    if request.method == "POST":
+        added_balance = (int)(request.POST['added_balance'])
+
+        with transaction.atomic():
             selected_user = User.objects.select_for_update().get(id=request.user.id)
 
             if added_balance<=0:
@@ -74,6 +74,23 @@ def addmoney(request):
 
             Transaction.objects.create(user=request.user, description="Added to wallet", change=added_balance)
 
-            return redirect('users:add_success')
+            return render(request, 'addmoney_successpage.html', {
+                'added_balance' : added_balance
+            })
 
     return render(request, 'addmoney.html')
+
+
+def mybookings(request):
+    if not request.user.is_authenticated:
+        return redirect('users:login')
+
+    events = request.user.events.all()
+    transactions = Transaction.objects.filter(user=request.user)
+
+    return render(request, 'viewbookings.html', {
+        'events' : events,
+        'transactions' : transactions,
+    })
+
+        

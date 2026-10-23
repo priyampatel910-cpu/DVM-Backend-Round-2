@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>The transaction was successful!</h1>
+    <h3>Rs. {{ added_balance }} were added to your wallet. </h3>
+    <div>
+        <a class="btn" href="{% url 'users:home' %}">Back to Dashboard</a>
+    </div>
+{% endblock %}

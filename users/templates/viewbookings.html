@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+  <style>
+    /* Styles used only on this page */
+    .top { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .label { margin: 0 0 .25rem; color: var(--muted); font-size: .9rem; font-weight: 500; }
+
+    /* Wallet box */
+    .wallet-balance { margin: 0 0 1.25rem; font: 700 2.6rem/1.1 var(--font-head); letter-spacing: -0.02em; }
+
+    /* Account details box */
+    .info { margin: 0; }
+    .info div { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid var(--line); }
+    .info div:last-child { border-bottom: 0; }
+    .info dt { color: var(--muted); }
+    .info dd { margin: 0; font-weight: 500; text-align: right; overflow-wrap: anywhere; }
+
+    /* Sections below */
+    .block { margin-top: 3.5rem; }
+    .block > h2 { margin-bottom: 1.25rem; }
+    .panel.flush { padding: 0; overflow-x: auto; }
+    .table tr:last-child td { border-bottom: 0; }
+    .credit { color: #0f7b4f; font-weight: 600; }
+    .debit { color: #881212; font-weight: 600; }
+    .nowrap { white-space: nowrap; }
+  </style>
+{% endblock %}
+
+{% block content %}
+<section class="block">
+    <h2>My bookings</h2>
+
+    {% if events %}
+      <div class="grid">
+        {% for event in events %}
+          <article class="event-card">
+
+            <div class="event-card-body">
+              <span class="badge">{{ event.category }}</span>
+              <h3>{{ event.name }}</h3>
+              <ul class="event-info">
+                <li>On {{ event.datetime }}</li>
+                <li>{{ event.venue }}</li>
+                <li>Booked on {{ booking.created_at|date:"j M Y" }}</li>
+              </ul>
+            </div>
+
+            <div class="event-card-footer">
+              <span class="price">Rs. {{ event.ticketprice }}</span>
+              <a class="btn" href="{% url 'booking:events_book' event.id %}">View event</a>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="panel">
+        <p class="muted" style="margin-bottom: 1rem;">You haven't booked any events yet.</p>
+        <a class="btn" href="{% url 'booking:events_index' %}">Browse events</a>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="block">
+    <h2>Transaction history</h2>
+
+    {% if transactions %}
+      <div class="panel flush">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th style="text-align: right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transaction in transactions %}
+              <tr>
+                <td class="nowrap">{{ transaction.transaction_at|date:"j M Y, g:i A" }}</td>
+                <td>{{ transaction.description }}</td>
+                <td class="nowrap" style="text-align: right;">
+                  {% if transaction.transaction_type == "credit" %}
+                    <span class="credit">+ {{ transaction.change }}</span>
+                  {% elif transaction.transaction_type == "debit" %}
+                    <span class="debit">{{ transaction.change }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel">
+        <p class="muted" style="margin: 0;">No transactions yet. Money you add or spend will appear here.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

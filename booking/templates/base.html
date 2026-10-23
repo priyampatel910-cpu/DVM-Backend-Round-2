@@ -123,7 +123,7 @@
         <a href="{% url 'booking:events_index' %}">Events</a>
 
         {% if user.is_authenticated %}
-          <a href="/bookings/">My bookings</a>
+          <a href="{% url 'users:mybookings' %}">My bookings</a>
           <span class="muted">{{ user.username }}</span>
           <form method="post" action="{% url 'users:logout' %}">
             {% csrf_token %}

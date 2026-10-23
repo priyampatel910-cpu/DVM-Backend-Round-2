@@ -104,7 +104,7 @@
             <div class="alert alert-error" style="margin: 1rem 0 0;">
               Your wallet balance is too low for this ticket.
               {# Change /wallet/ to the page where users add money #}
-              <a href="/wallet/">Add money</a>
+              <a href="{% url 'users:addmoney' %}">Add money</a>
             </div>
           {% else %}
             <p class="note">One ticket per account. The price will be taken from your wallet when you confirm.</p>

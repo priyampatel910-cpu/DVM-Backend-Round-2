@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User
+from django.utils import timezone
 
 # Create your models here.
 
@@ -28,6 +29,16 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description  =  models.CharField()
     change = models.IntegerField(default=0)
+    transaction_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.user.first_name}'s account balance change: {self.change} "
+        return f"{self.user.first_name}'s account balance change: {self.change} at {self.transaction_at}"
+
+    @property
+
+    def transaction_type(self):
+        if self.change > 0:
+            return "credit"
+
+        else:
+            return 'debit'

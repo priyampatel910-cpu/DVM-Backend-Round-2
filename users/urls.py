@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from users import views
 
 app_name = 'users'
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('', views.homeredirect, name='homeredirect'),
     path('logout/', views.logout_view, name='logout'),
     path('addmoney/', views.addmoney, name='addmoney'),
+    path('mybookings/', views.mybookings, name='mybookings'),
 ]
