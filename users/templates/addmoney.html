@@ -1,10 +1,17 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+    <style>
+        .back { display: inline-block; margin-bottom: 1.5rem; color: var(--muted); text-decoration: none; font-weight: 500; }
+        .back:hover { color: var(--text); }
+    </style>
+{% endblock %}
+
 {% block content %}
 <div>
     <a class="back" href="{% url 'users:home' %}">← Back to Dashboard</a>
 </div>
-    <section class="event-card">
+
         
     <h1>Add money to your wallet</h1>
     <div>Current balance: Rs. {{user.balance}} </div>
@@ -19,5 +26,4 @@
         <input class="btn" type="submit" name="Add">    
     </form>
 
-</section>
 {% endblock %}
