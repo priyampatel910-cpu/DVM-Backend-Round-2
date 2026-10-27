@@ -7,10 +7,16 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomAdminUserCreationForm
     form = CustomUserChangeForm
     model = User
-    list_display = ['username', 'email', 'balance', 'is_staff']
+    list_display = ['username', 'email', 'balance', 'is_staff',] #'is_organizer']
 
     fieldsets = UserAdmin.fieldsets + (
         ("Balance", {"fields": ("balance",)}),
+        ("Organizer Access", {"fields": ("is_organizer",)}),
+    )
+
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ("Balance", {"fields": ("balance",)}),
+        ("Organizer Access", {"fields": ("is_organizer",)}),
     )
 
 admin.site.register(User, CustomUserAdmin)

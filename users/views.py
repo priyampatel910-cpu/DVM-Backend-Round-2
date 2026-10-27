@@ -29,6 +29,13 @@ def signup_view(request):
             user = form.save()
             login(request, user)
             return redirect('users:home')
+
+        else:
+            form = CustomUserCreationForm()
+            return render(request, 'signup.html', {
+                'error_msg' : "Invalid Details! Try again.",
+                'form' : form,
+            })
         
     else:
         form = CustomUserCreationForm()
@@ -39,7 +46,11 @@ def signup_view(request):
 
 def home(request):
     if request.user.is_authenticated:
-        return render(request, 'user_homepage.html', {
+        if request.user.is_organizer:
+            return render(request, 'organizer_homepage.html')
+
+        else:
+            return render(request, 'user_homepage.html', {
 
         })
     else:
@@ -93,4 +104,28 @@ def mybookings(request):
         'transactions' : transactions,
     })
 
-        
+def organizer_addevent(request):
+    if request.user.is_organizer:
+        if request.method == "POST":
+            form = EventCreateForm(request.POST)
+            
+            if form.is_valid:
+                form.save()
+                return redirect('users:home')
+            
+            else:
+                form = EventCreateForm()
+                return render(request, 'organizer_addevent.html', {
+                    'form' : form,
+                    "error_msg" : "Invalid details. Try again",
+                })
+
+        else:
+            form = EventCreateForm()
+
+        return render(request, 'organizer_addevent.html',{
+            'form' : form,
+        })
+
+    else:
+        return redirect('users:home')

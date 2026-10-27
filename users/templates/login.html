@@ -2,6 +2,9 @@
 
 {% block content %}
     
+{% if message %}
+    <p style="color: darkred;"> {{message}} </p>
+{% endif %}
 
     <form class="form" action="{% url 'users:login' %}" method="POST">
         {% csrf_token %}
@@ -9,7 +12,7 @@
         <input type="password" name="password" placeholder="Password">
         <input type="submit" name="Login">
     </form>
-
+<br>
     <div>
         New User?
         <a href="{% url 'users:signup' %}">Create New Account</a>

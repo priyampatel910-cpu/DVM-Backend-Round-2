@@ -1,5 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, AdminUserCreationForm, UserChangeForm
 from .models import User
+from booking.models import Event
+from django import forms
 
 class CustomAdminUserCreationForm(AdminUserCreationForm):
     class Meta(AdminUserCreationForm.Meta):
@@ -16,3 +18,11 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = User
         ( 'first_name', 'last_name', 'email',)
+
+class EventCreateForm(forms.ModelForm):
+    class Meta():
+        model = Event
+        fields = ["name", "category", "venue", "datetime", "ticketprice", "available_slots"]
+        widgets = {
+            "date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        }

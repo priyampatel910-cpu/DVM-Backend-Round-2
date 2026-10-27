@@ -10,7 +10,7 @@ class Event(models.Model):
     venue = models.CharField()
     datetime = models.DateTimeField()
     ticketprice = models.IntegerField()
-    organizer = models.CharField(null=True, default=None)
+    organizer = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="organized_events")
     available_slots = models.PositiveIntegerField(default=0)
     audience = models.ManyToManyField(User, related_name="events", blank=True)
 
