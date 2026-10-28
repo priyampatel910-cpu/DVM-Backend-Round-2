@@ -23,7 +23,7 @@
 >
 > Firstly, you get to book ONLY ONE TICKET for any event per one user. This is in sync with the BITS fest apps where the student can book an event ticket only for himself. So when the POST request is sent, the template will check if the user has any ticket prior to now or not, and will respond accordingly. (This could be changed to multiple tickets per user, using an intermediate table)
 >
-> Secondly, if the user has less money in their wallet than the ticketprice, then the transaction will not take place and the user will be warned and advised to add money to their wallet.
+> Secondly, if the user has less money in their wallet than the ticket price, then the transaction will not take place and the user will be warned and advised to add money to their wallet.
 >
 > Lastly, if the tickets for the event are sold out, the user will not be able to book the event and will get the error message.
 >
@@ -40,7 +40,7 @@
 >* The organizer can also create a new event using *Add event* option on organizer dashboard.
 
 
-## 2. How to use (Without Dockerizing)?
+## 2. How to use? (Without Dockerizing)
 >
 > ## Prerequisites
 >
@@ -68,19 +68,30 @@
 > *Note: This automatically creates a `.venv` directory and installs the dependencies listed in `pyproject.toml` / `uv.lock`.*
 >
 > Activate the virtual environment: `.venv\Scripts\activate.bat`
-
+>
 > ### 3. Configure Environment Variables
 > Create a `.env` file in the root directory of the project to configure your PostgreSQL database connection and Django settings. 
 >
+>Use this to create the Django secret key required in in `.env` file:
+>```bash
+>python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+>```
 >
->* I have already added `env.example` file in the repo for the format.*
+> *I have already added* `env.example` *file in the repo for the format. Note that you have to name your actual environment file* `.env`
 >
 > ### 4. Create the Database
 > Ensure your PostgreSQL server is running, then create a database matching the name in your `.env` file:
 > ```sql
-> CREATE DATABASE db_name;
+> 
+> CREATE ROLE event_app_user
+> WITH LOGIN PASSWORD 'your-password';
+>
+> CREATE DATABASE event_platform
+> OWNER event_app_user;
+>
 > ```
-
+> *I have already configured the* `DATABASES` *so that it directly reads from* `.env` *which you have created above.*
+>
 > ### 5. Run Migrations and Start the Server
 > Apply the database migrations to set up your tables:
 > ```bash
@@ -91,15 +102,18 @@
 >```bash
 > uv run python manage.py createsuperuser
 > ```
-
+>
 > Start the local development server:
 > ```bash
 > uv run python manage.py runserver
 >```
-> The application will be accessible at `http://127.0.0`.
-
+> The application will be accessible at `127.0.0.1:8000`.
+>
 > ## Running Management Commands
 > Because this project uses `uv`, you can run any Django management command by prefixing it with `uv run`:
->* Add a new package: `uv add package_name`
+>* Add a new package: `uv add package_name`.
+>* 
+
+
 
 
