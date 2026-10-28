@@ -28,27 +28,27 @@ def events_book(request, event_id):
             if is_already_booked:
                 return render(request, 'events_book.html',{
                     'is_already_booked' : is_already_booked,
-                    'event' : event
+                    'event' : event,
                 })
             
-            if selected_event.available_slots < 1:
+            if selected_event.available_slots - selected_event.booked_slots < 1:
                 return render(request, 'events_book.html', {
                     'error_message' : "Tickets are sold out!",
-                    'event' : event
+                    'event' : event,
                 })
             
             if user.balance < selected_event.ticketprice:
                 return render(request, 'events_book.html', {
                     'insufficient_funding' : "Your wallet balance is too low for this ticket.",
-                    'event' : event
+                    'event' : event,
                 })
 
             user.balance -= selected_event.ticketprice
-            selected_event.available_slots -= 1
+            selected_event.booked_slots += 1
             user.save(update_fields=['balance'])
 
             selected_event.audience.add(user)
-            selected_event.save(update_fields=['available_slots'])
+            selected_event.save(update_fields=['booked_slots'])
 
             Booking.objects.create(user=user, event=event)
             Transaction.objects.create(user=user, description=selected_event.name, change= -selected_event.ticketprice)

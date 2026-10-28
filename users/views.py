@@ -47,7 +47,10 @@ def signup_view(request):
 def home(request):
     if request.user.is_authenticated:
         if request.user.is_organizer:
-            return render(request, 'organizer_homepage.html')
+            organizer_events = request.user.organized_events.all()
+            return render(request, 'organizer_homepage.html', {
+                'events' : organizer_events,
+            })
 
         else:
             return render(request, 'user_homepage.html', {
@@ -110,6 +113,8 @@ def organizer_addevent(request):
             form = EventCreateForm(request.POST)
             
             if form.is_valid:
+                event = form.save(commit = False)
+                event.organizer = request.user
                 form.save()
                 return redirect('users:home')
             
@@ -129,3 +134,14 @@ def organizer_addevent(request):
 
     else:
         return redirect('users:home')
+
+def organizer_eventdetails(request, event_id):
+    event = Event.objects.get(pk = event_id)
+
+    revenue = event.booked_slots * event.ticketprice
+
+    return render(request, 'organizer_eventdetails.html', {
+        'event' : event,
+        'revenue' : revenue,
+        'attendees' : event.audience.all()
+    })

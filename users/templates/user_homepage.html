@@ -31,7 +31,7 @@
 
 {% block content %}
 
-  <h1>Hello, {{ user.get_full_name|default:user.username }}</h1>
+  <h1>Hello, {{ user.first_name|default:user.username }}</h1>
   <p class="muted">Here's a summary of your account.</p>
 
   <div class="top">

@@ -1,11 +1,32 @@
-{% extends 'organizer_base.html' %}
+{% extends "organizer_base.html" %}
+
+{% block title %}Create event{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Styles used only on this page */
+    .form-wrap { max-width: 620px; margin-inline: auto; }
+    .form-wrap > p { margin-bottom: 1.5rem; }
+    .form textarea { min-height: 150px; resize: vertical; }
+    .form-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .5rem; }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    .btn-outline:hover { background: var(--soft); color: var(--text); }
+  </style>
+{% endblock %}
 
 {% block content %}
+  <div class="form-wrap">
+    <h1>Create event</h1>
+    <p class="muted">Fill in the details below. Your event will appear on the events page once it's saved.</p>
 
-    <form action="{% url 'users:addevent' %}" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" name="Add event">
+    <form method="post" class="panel form">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <div class="form-actions">
+        <button class="btn" type="submit">Create event</button>
+        <a class="btn btn-outline" href="{% url 'users:home' %}">Cancel</a>
+      </div>
     </form>
-
+  </div>
 {% endblock %}

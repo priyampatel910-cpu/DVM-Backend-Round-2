@@ -1,20 +1,52 @@
-{% extends 'organizer_base.html' %}
+{% extends "organizer_base.html" %}
+
+{% block title %}Organizer dashboard{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Styles used only on this page */
+    .page-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+    .page-top h1 { margin-bottom: .25rem; }
+    .page-top p { margin: 0; }
+
+    /* One clickable card per event */
+    .org-card { display: flex; flex-direction: column; gap: .35rem; padding: 1.4rem 1.5rem; background: var(--surface);
+                border: 1px solid var(--line); border-radius: 12px; color: var(--text); text-decoration: none;
+                transition: border-color .15s, box-shadow .15s; }
+    .org-card:hover { border-color: var(--primary); box-shadow: 0 6px 18px rgba(18, 22, 31, .07); color: var(--text); }
+    .org-card h3 { margin: 0 0 .75rem; }
+    .org-label { color: var(--muted); font-size: .85rem; }
+    .org-card .price { font-size: 1.4rem; }
+    .org-link { margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: .95rem; }
+  </style>
+{% endblock %}
 
 {% block content %}
-    {% if events %}
-        <ul>
-            {% for event in events %}
-                <li> {{event.name}} </li>
-            {% empty %}
-                <li>You have no organized events right now.</li>
 
-            {% endfor %}
-    {% endif %}
-
-    <br>
-
+  <div class="page-top">
     <div>
-        <a href="{% url 'users:addevent' %}">Add an event</a>
+      <h1> {{ request.user.first_name }} </h1>
+      <p class="muted">Select an event to see its sales and attendees.</p>
     </div>
+    <a class="btn" href="{% url 'users:addevent' %}">Create event</a>
+  </div>
+
+  {% if events %}
+    <div class="grid">
+      {% for event in events %}
+        <a class="org-card" href="{% url 'users:eventdetails' event.id %}">
+          <h3>{{ event.name }}</h3>
+          <span class="org-label">Ticket price</span>
+          <span class="price">Rs. {{ event.ticketprice }}</span>
+          <span class="org-link">View details →</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="panel">
+      <p class="muted" style="margin-bottom: 1rem;">You haven't created any events yet.</p>
+      <a class="btn" href="{% url 'users:addevent' %}">Create your first event</a>
+    </div>
+  {% endif %}
 
 {% endblock %}

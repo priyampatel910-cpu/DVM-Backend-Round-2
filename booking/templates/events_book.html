@@ -98,7 +98,7 @@
           {% if is_already_booked %}
             <div class="alert alert-warning" style="margin: 1rem 0 0;">
               You already have a ticket for this event.
-              <a href="{% url 'users:home' %}">View my bookings</a>
+              <a href="{% url 'users:mybookings' %}">View my bookings</a>
             </div>
           {% elif user.balance < event.ticketprice %}
             <div class="alert alert-error" style="margin: 1rem 0 0;">

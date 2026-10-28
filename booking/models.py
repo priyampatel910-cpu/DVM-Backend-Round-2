@@ -12,6 +12,7 @@ class Event(models.Model):
     ticketprice = models.IntegerField()
     organizer = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="organized_events")
     available_slots = models.PositiveIntegerField(default=0)
+    booked_slots = models.PositiveIntegerField(default=0)
     audience = models.ManyToManyField(User, related_name="events", blank=True)
 
     def __str__(self):
@@ -26,7 +27,7 @@ class Booking(models.Model):
         return f"{self.user.first_name} booked {self.event.name}"
 
 class Transaction(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transaction")
     description  =  models.CharField()
     change = models.IntegerField(default=0)
     transaction_at = models.DateTimeField(default=timezone.now)

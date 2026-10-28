@@ -1,0 +1,107 @@
+{% extends "organizer_base.html" %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Styles used only on this page */
+    .back { display: inline-block; margin-bottom: 1.5rem; color: var(--muted); text-decoration: none; font-weight: 500; }
+    .back:hover { color: var(--text); }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 1.5rem 0 3rem; }
+    .stat-label { margin: 0 0 .25rem; color: var(--muted); font-size: .9rem; font-weight: 500; }
+    .stat-value { margin: 0; font: 700 2.2rem/1.1 var(--font-head); letter-spacing: -0.02em; }
+
+    .block { margin-top: 3rem; }
+    .block > h2 { margin-bottom: 1.25rem; }
+
+    .event-image { aspect-ratio: 16 / 9; margin-bottom: 1.5rem; background: var(--soft); border-radius: 12px; overflow: hidden; }
+    .event-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .details { display: grid; grid-template-columns: 7rem 1fr; gap: .6rem 1rem; margin: 0 0 1.5rem; }
+    .details dt { color: var(--muted); }
+    .details dd { margin: 0; font-weight: 500; }
+    .description { margin: 0; color: var(--muted); }
+
+    .panel.flush { padding: 0; overflow-x: auto; }
+    .table tr:last-child td { border-bottom: 0; }
+    .nowrap { white-space: nowrap; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <a class="back" href="{% url 'users:home' %}">← Back to dashboard</a>
+
+  <span class="badge">{{ event.category }}</span>
+  <h1>{{ event.name }}</h1>
+
+  {# ===== Sales summary ===== #}
+  <div class="stats">
+    <div class="panel">
+      <p class="stat-label">Tickets sold</p>
+      <p class="stat-value">{{ event.booked_slots }}</p>
+    </div>
+    <div class="panel">
+      <p class="stat-label">Total sales</p>
+      <p class="stat-value">Rs. {{ revenue }}</p>
+    </div>
+    <div class="panel">
+      <p class="stat-label">Ticket price</p>
+      <p class="stat-value">Rs. {{ event.ticketprice }}</p>
+    </div>
+  </div>
+
+  <section class="block" style="margin-top: 0;">
+    <h2>Event details</h2>
+    <div class="panel">
+
+      <dl class="details">
+        <dt>Date & Time</dt>
+        <dd>{{ event.datetime }}</dd>
+
+        <dt>Venue</dt>
+        <dd>{{ event.venue }}</dd>
+
+        <dt>Category</dt>
+        <dd>{{ event.category }}</dd>
+      </dl>
+
+      <p class="description">{{ event.description|linebreaksbr }}</p>
+    </div>
+  </section>
+
+  {# ===== Attendees ===== #}
+  <section class="block">
+    <h2>Attendees ({{  attendees|length }})</h2>
+
+    {% if attendees %}
+      <div class="panel flush">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Booked on</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for attendee in attendees %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ attendee.get_full_name|default:"-" }}</td>
+                <td>{{ attendee.username }}</td>
+                <td>{{ attendee.email|default:"-" }}</td>
+                <td class="nowrap">{{ booking.created_at|date:"j M Y, g:i A" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="panel">
+        <p class="muted" style="margin: 0;">No tickets have been booked yet. Attendees will appear here.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
