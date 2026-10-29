@@ -24,21 +24,11 @@ Evently has two kinds of people using it: **users** who book events, and **organ
 
 Three checks run before a booking goes through:
 
-Rule
-
-What happens if it fails
-
-**One ticket per user, per event**
-
-The booking is blocked. This mirrors the BITS fest apps, where you only book a ticket for yourself.
-
-**Enough money in the wallet**
-
-The booking is blocked and you're nudged to top up your wallet.
-
-**Slots still available**
-
-You get a "sold out" error.
+| Rule | What happens if it fails |
+| --- | --- |
+| **One ticket per user, per event** | The booking is blocked. This mirrors the BITS fest apps, where you only book a ticket for yourself. |
+| **Enough money in the wallet** | The booking is blocked and you're nudged to top up your wallet. |
+| **Slots still available** | You get a "sold out" error. |
 
 If everything checks out, the ticket price is deducted from your wallet, the event's available slots drop by one, and the event shows up in **My Bookings**.
 
