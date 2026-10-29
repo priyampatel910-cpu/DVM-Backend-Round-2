@@ -1,119 +1,190 @@
-# DVM Recruitment: Task Two
 
-  
+#  Evently
 
-## 1. Description of the project:
+A small event-booking web app built with **Django** and **PostgreSQL**. Users book tickets using an in-app wallet, and organizers create and manage their own events.
 
- I have selected the basic track for the task.
+This is my submission for **DVM Recruitment, Task Two** (Backend, Basic Track).
 
- The project I made is a web service called Evently, which lets a user book events, as well as allow organizers to create events.
+----------
 
->## Features (User)
->
-> A new user is directed to the home page, where there are options to sign up and log in.
-> I have made the website such that the user cannot aaccess anything without being authenticated, so login/signup is required.
-> Won't go into technical details now, but I made the signup feature with a customized version of `UserCreationForm()`
->
-> The moment you authenticate yourself, you will be directed to a user homepage/dashboard, where you can view your user account. The features Evently provides is:
-> * It lets the user view their wallet balance (default is 0)
-> * It lets the user add money to their wallet (for now, a fake payment gateway)
-> * It lets the user browse for upcoming events in the Events section, where each event shows its name, its category, venue, date and time, and the ticket price
-> * When a user click on a certain event's booking page link, the user gets redirected to the booking page with more information onthe event, as well as the billing summary.
-> * Here is where I introduced some constraints for booking:
->
-> Firstly, you get to book ONLY ONE TICKET for any event per one user. This is in sync with the BITS fest apps where the student can book an event ticket only for himself. So when the POST request is sent, the template will check if the user has any ticket prior to now or not, and will respond accordingly. (This could be changed to multiple tickets per user, using an intermediate table)
->
-> Secondly, if the user has less money in their wallet than the ticket price, then the transaction will not take place and the user will be warned and advised to add money to their wallet.
->
-> Lastly, if the tickets for the event are sold out, the user will not be able to book the event and will get the error message.
->
->  * In case the booking is successful, the amount of money equal to the ticket price of the event will be deducted from the user's account, available slots of the event will decrease by one, and now, when the user goes on My Bookings page (must be authenticated), they will see the list of events they booked
->  * In addition to that, My Bookings will also show the transaction history, may it be Wallet add or Wallet deduct (I am planning to make a separate page for that too)
->  * The authenticated user can sign out at any instance they want, once they sign up/ log in
+## What does it do?
 
-> ## Features (Organizer)
-> I have also added a feature that allows an **organizer user account** to create and handle events. This special account can only be made by **superuser** in Django Admin.
->
->It has the following features:
->* The organizer logs in with provided credentials.
->* The organizer can view all of their current events, and can view details. regarding any particular event, like the amount of tickets sold, number of slots remaining or customer details.
->* The organizer can also create a new event using *Add event* option on organizer dashboard.
+Evently has two kinds of people using it: **users** who book events, and **organizers** who put those events up. Everything sits behind a login, so you can't see anything without signing up first.
 
+### For users
 
-## 2. How to use? (Without Dockerizing)
->
-> ## Prerequisites
->
-> Before running this project, ensure you have the following installed:
-> * **Python** (version 3.10+ recommended)
-> * **uv** (Fast Python package installer and manager)
-> * **PostgreSQL** (Running locally or accessible via a network)
+-   **Sign up / log in:** the signup form is a customised version of Django's `UserCreationForm()`.
+-   **Wallet:** every account starts with a balance of 0. You can top it up through a *(fake)* payment gateway.
+-   **Browse events:** see each event's name, category, venue, date and time, and ticket price.
+-   **Booking page:** click an event to see more details plus a billing summary before you confirm.
+-   **My Bookings:** your booked events and your full transaction history (wallet top-ups and deductions).
+-   **Sign out** whenever you like.
 
-> ## Getting Started
->
-> Follow these steps to clone the repository and set up your local development environment.
->
-> ### 1. Clone the Repository
-> ```bash
-> cd projectfile
-> git clone https://github.com/priyampatel910-cpu/DVM-Backend-Round-2.git
-> cd event-platform
-> ```
->
-> ### 2. Set Up the Virtual Environment and Dependencies
-> This project uses `uv` for dependency management. Run the following command to create a virtual environment and install all required packages:
-> ```bash
-> uv sync
-> ```
-> *Note: This automatically creates a `.venv` directory and installs the dependencies listed in `pyproject.toml` / `uv.lock`.*
->
-> Activate the virtual environment: `.venv\Scripts\activate.bat`
->
-> ### 3. Configure Environment Variables
-> Create a `.env` file in the root directory of the project to configure your PostgreSQL database connection and Django settings. 
->
->Use this to create the Django secret key required in in `.env` file:
->```bash
->python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
->```
->
-> *I have already added* `env.example` *file in the repo for the format. Note that you have to name your actual environment file* `.env`
->
-> ### 4. Create the Database
-> Ensure your PostgreSQL server is running, then create a database matching the name in your `.env` file:
-> ```sql
-> 
-> CREATE ROLE event_app_user
-> WITH LOGIN PASSWORD 'your-password';
->
-> CREATE DATABASE event_platform
-> OWNER event_app_user;
->
-> ```
-> *I have already configured the* `DATABASES` *so that it directly reads from* `.env` *which you have created above.*
->
-> ### 5. Run Migrations and Start the Server
-> Apply the database migrations to set up your tables:
-> ```bash
-> uv run python manage.py migrate
->  ```
->
-> Create a superuser to access the Django admin panel:
->```bash
-> uv run python manage.py createsuperuser
-> ```
->
-> Start the local development server:
-> ```bash
-> uv run python manage.py runserver
->```
-> The application will be accessible at `127.0.0.1:8000`.
->
-> ## Running Management Commands
-> Because this project uses `uv`, you can run any Django management command by prefixing it with `uv run`:
->* Add a new package: `uv add package_name`.
->* 
+### Booking rules
 
+Three checks run before a booking goes through:
 
+Rule
 
+What happens if it fails
 
+**One ticket per user, per event**
+
+The booking is blocked. This mirrors the BITS fest apps, where you only book a ticket for yourself.
+
+**Enough money in the wallet**
+
+The booking is blocked and you're nudged to top up your wallet.
+
+**Slots still available**
+
+You get a "sold out" error.
+
+If everything checks out, the ticket price is deducted from your wallet, the event's available slots drop by one, and the event shows up in **My Bookings**.
+
+> Note: Allowing multiple tickets per user would be easy to add later using an intermediate table.
+
+### For organizers
+
+Organizer accounts can only be created by a **superuser** from the Django Admin panel. Once an organizer logs in with their credentials, they can:
+
+-   See all their events on one dashboard
+-   Open any event to check tickets sold, slots remaining, and customer details
+-   Create new events with the **Add event** option
+
+----------
+
+## Running it locally (without Docker)
+
+### Prerequisites
+
+-   **Python** 3.10+
+-   **uv** as recommended in the task description
+-   **PostgreSQL** 18.6
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/priyampatel910-cpu/DVM-Backend-Round-2.git
+cd DVM-Backend-Round-2
+```
+
+### 2. Install dependencies
+
+```bash
+uv sync
+```
+
+This creates a `.venv` folder and installs everything listed in `pyproject.toml` / `uv.lock`.
+
+<details> <summary>Want to activate the virtual environment manually?</summary>
+
+`uv run` picks up the environment automatically, so this is optional.
+
+-   **Windows (CMD):** `.venv\Scripts\activate.bat`
+-   **Windows (VS Code):** press `Ctrl + Shift + P`, choose **Python: Select Interpreter**, pick `event-platform`, then open a new terminal.
+
+</details>
+
+### 3. Set up your `.env` file
+
+Copy the example file and rename it to `.env` in the project root:
+
+```bash
+cp .env.example .env
+```
+
+Fill in your database details, then generate a Django secret key and paste it in:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+`settings.py` reads the database config straight from this file.
+
+### 4. Create the database
+
+With PostgresQL running, create a role and database that match what you put in `.env`:
+
+```sql
+CREATE ROLE event_app_user
+  WITH LOGIN PASSWORD 'your-password';
+
+CREATE DATABASE event_platform
+  OWNER event_app_user;
+
+```
+
+### 5. Migrate, create a superuser, and run
+
+```bash
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
+
+```
+
+Open **http://127.0.0.1:8000** and you're in.
+
+> [!TIP] Since this project uses `uv`, prefix any Django command with `uv run`. To add a package, use `uv add package_name`.
+
+----------
+
+## Running it with Docker
+
+The repo includes a `compose.yaml` and a `Dockerfile`, but I haven't published a prebuilt image, so you'll build it yourself. Compose runs two services: **web** (Django) and **db** (PostgreSQL), so you don't need a separate Dockerfile for Postgres.
+
+> Note: I learned how to write the compose file for this project, but I still don't fully understand how the `healthcheck` options work. I'll dig into that once I'm done with the rest.
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/priyampatel910-cpu/DVM-Backend-Round-2.git
+cd DVM-Backend-Round-2
+
+```
+
+### 2. Create your `.env` file
+
+Rename `.env.example` to `.env` and fill in the details. It needs to live in the **project root**.
+
+### 3. Build and start the services
+
+Make sure you have Docker Engine installed (I built this on v29.9.2), then run:
+
+```bash
+docker compose up --build -d
+
+```
+
+The `-d` flag is optional. It runs the containers in the background so you can keep using your terminal.
+
+### 4. Migrate and create a superuser
+
+The migration files are already committed, so there's no need to run `makemigrations`. Just apply them:
+
+```bash
+docker compose run --rm web uv run --no-sync python manage.py migrate
+
+```
+
+Then create your superuser the same way:
+
+```bash
+docker compose run --rm web uv run --no-sync python manage.py createsuperuser
+
+```
+
+You can swap in any other Django command after `uv run`.
+
+> Note: **`docker compose run` vs `docker compose exec`:** `run` spins up a _temporary_ container for a single command (`--rm` deletes it afterwards), while `exec` runs a command inside a container that's _already running_. Use whichever suits you.
+
+----------
+
+## Looking back
+
+This project was tough, but seeing everything finally work smoothly was really satisfying. I know it has some fundamental problems: my model choices could be better, and I put everything in one app instead of splitting features into separate ones, which will hurt scalability. I've learned from these mistakes and plan to do better in the next project.
+
+## A note on AI usage
+
+All the minimalistic HTML templates were generated by AI, because I don't know CSS well enough to style them myself. All I did was pass data from `views.py` into the templates, and the rest of the UI is AI-generated. Since this is a backend task, I figured a fancy frontend wasn't necessary, but I added one anyway. Hope you don't mind! I'm happy to share the chat if you'd like to see it.
