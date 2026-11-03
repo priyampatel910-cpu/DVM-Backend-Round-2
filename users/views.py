@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
 from booking.models import *
@@ -101,10 +101,12 @@ def mybookings(request):
 
     events = request.user.events.all()
     transactions = Transaction.objects.filter(user=request.user)
+    bookings = Booking.objects.filter(user=request.user)
 
     return render(request, 'viewbookings.html', {
         'events' : events,
         'transactions' : transactions,
+        'bookings' : bookings,
     })
 
 def organizer_addevent(request):
@@ -136,12 +138,17 @@ def organizer_addevent(request):
         return redirect('users:home')
 
 def organizer_eventdetails(request, event_id):
-    event = Event.objects.get(pk = event_id)
+    event = get_object_or_404(Event, id=event_id)
+    attendees = event.audience.all()
+
+    for attendee in attendees:
+        booking = attendee.bookings.filter(event=event).first()
+        attendee.current_booking_at = booking.booked_at if booking else None
 
     revenue = event.booked_slots * event.ticketprice
 
     return render(request, 'organizer_eventdetails.html', {
         'event' : event,
         'revenue' : revenue,
-        'attendees' : event.audience.all()
+        'attendees' : attendees,
     })

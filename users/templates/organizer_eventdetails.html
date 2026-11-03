@@ -1,6 +1,6 @@
 {% extends "organizer_base.html" %}
 
-{% block title %}{{ event.title }}{% endblock %}
+{% block title %}{{ event.name }}{% endblock %}
 
 {% block extra_head %}
   <style>
@@ -82,7 +82,7 @@
               <th>Name</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Booked on</th>
+              <th>Booked at</th>
             </tr>
           </thead>
           <tbody>
@@ -92,7 +92,7 @@
                 <td>{{ attendee.get_full_name|default:"-" }}</td>
                 <td>{{ attendee.username }}</td>
                 <td>{{ attendee.email|default:"-" }}</td>
-                <td class="nowrap">{{ booking.created_at|date:"j M Y, g:i A" }}</td>
+                <td>{{ attendee.current_booking_at }}</td>
               </tr>
             {% endfor %}
           </tbody>

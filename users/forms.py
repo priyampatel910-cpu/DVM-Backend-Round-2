@@ -6,8 +6,10 @@ from django import forms
 class CustomAdminUserCreationForm(AdminUserCreationForm):
     class Meta(AdminUserCreationForm.Meta):
         model = User
-        fields = ('username', 'balance')
-
+        fields = (
+            'username',
+            'balance'
+        )
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
@@ -17,12 +19,24 @@ class CustomUserCreationForm(UserCreationForm):
 class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = User
-        fields = ( 'first_name', 'last_name', 'email',)
+        fields = (
+            'first_name',
+            'last_name',
+            'email',
+        )
 
 class EventCreateForm(forms.ModelForm):
     class Meta():
         model = Event
-        fields = ["name", "category", "venue", "datetime", "ticketprice", "available_slots"]
+        fields = [
+            "name",
+            "category",
+            "description",
+            "venue",
+            "datetime",
+            "ticketprice",
+            "available_slots"
+        ]
         widgets = {
             "date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
