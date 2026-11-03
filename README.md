@@ -128,6 +128,15 @@ You can swap in any other Django command after `uv run`.
 
 ----------
 
+## Hosting on a VPS
+I have hosted the dockerized application on a VPS, which I obtained from AWS, as I couldn't get free credits from Microsoft Azure even after multiple attempts.
+
+You can visit the web application [here](http://3.27.0.48)
+
+IP: 3.27.0.48 (Visit as http:// as I have not yet got SSL certificate)
+
+----------
+
 ## Looking back
 
 This project was tough, but seeing everything finally work smoothly was really satisfying. I know it has some fundamental problems: my model choices could be better, and I put everything in one app instead of splitting features into separate ones, which will hurt scalability. I've learned from these mistakes and plan to do better in the next project.
