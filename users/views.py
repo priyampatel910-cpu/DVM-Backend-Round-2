@@ -138,17 +138,18 @@ def organizer_addevent(request):
         return redirect('users:home')
 
 def organizer_eventdetails(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-    attendees = event.audience.all()
+    if user.is_authenticated:
+        event = get_object_or_404(Event, id=event_id)
+        attendees = event.audience.all()
 
-    for attendee in attendees:
-        booking = attendee.bookings.filter(event=event).first()
-        attendee.current_booking_at = booking.booked_at if booking else None
+        for attendee in attendees:
+            booking = attendee.bookings.filter(event=event).first()
+            attendee.current_booking_at = booking.booked_at if booking else None
 
-    revenue = event.booked_slots * event.ticketprice
+        revenue = event.booked_slots * event.ticketprice
 
-    return render(request, 'organizer_eventdetails.html', {
-        'event' : event,
-        'revenue' : revenue,
-        'attendees' : attendees,
-    })
+        return render(request, 'organizer_eventdetails.html', {
+            'event' : event,
+            'revenue' : revenue,
+            'attendees' : attendees,
+        })
