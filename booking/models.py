@@ -18,7 +18,7 @@ class Event(models.Model):
     datetime = models.DateTimeField(
         help_text="Please use the following format: YYYY-MM-DD HH:MM:SS",
     )
-    ticketprice = models.IntegerField()
+    ticketprice = models.PositiveIntegerField()
     organizer = models.ForeignKey(
         User,
         default=None,

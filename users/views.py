@@ -47,7 +47,7 @@ def signup_view(request):
 def home(request):
     if request.user.is_authenticated:
         if request.user.is_organizer:
-            organizer_events = request.user.organized_events.all()
+            organizer_events = request.user.organized_events.only("name", "ticketprice")
             return render(request, 'organizer_homepage.html', {
                 'events' : organizer_events,
             })
@@ -99,57 +99,65 @@ def mybookings(request):
     if not request.user.is_authenticated:
         return redirect('users:login')
 
-    events = request.user.events.all()
     transactions = Transaction.objects.filter(user=request.user)
     bookings = Booking.objects.filter(user=request.user)
 
     return render(request, 'viewbookings.html', {
-        'events' : events,
         'transactions' : transactions,
         'bookings' : bookings,
     })
 
 def organizer_addevent(request):
-    if request.user.is_organizer:
-        if request.method == "POST":
-            form = EventCreateForm(request.POST)
-            
-            if form.is_valid:
-                event = form.save(commit = False)
-                event.organizer = request.user
-                form.save()
-                return redirect('users:home')
-            
+    if request.user.is_authenticated:
+        if request.user.is_organizer:
+            if request.method == "POST":
+                form = EventCreateForm(request.POST)
+                
+                if form.is_valid:
+                    event = form.save(commit = False)
+                    event.organizer = request.user
+                    form.save()
+                    return redirect('users:home')
+                
+                else:
+                    form = EventCreateForm()
+                    return render(request, 'organizer_addevent.html', {
+                        'form' : form,
+                        "error_msg" : "Invalid details. Try again",
+                    })
+
             else:
                 form = EventCreateForm()
-                return render(request, 'organizer_addevent.html', {
-                    'form' : form,
-                    "error_msg" : "Invalid details. Try again",
-                })
+
+            return render(request, 'organizer_addevent.html',{
+                'form' : form,
+            })
 
         else:
-            form = EventCreateForm()
-
-        return render(request, 'organizer_addevent.html',{
-            'form' : form,
-        })
+            return redirect('users:home')
 
     else:
         return redirect('users:home')
 
 def organizer_eventdetails(request, event_id):
-    if user.is_authenticated:
-        event = get_object_or_404(Event, id=event_id)
-        attendees = event.audience.all()
+    if request.user.is_authenticated:
+        if request.user.is_organizer:
+            event = get_object_or_404(Event, id=event_id)
+            attendees = event.audience.all()
 
-        for attendee in attendees:
-            booking = attendee.bookings.filter(event=event).first()
-            attendee.current_booking_at = booking.booked_at if booking else None
+            for attendee in attendees:
+                booking = attendee.bookings.filter(event=event).first()
+                attendee.current_booking_at = booking.booked_at if booking else None
 
-        revenue = event.booked_slots * event.ticketprice
+            revenue = event.booked_slots * event.ticketprice
 
-        return render(request, 'organizer_eventdetails.html', {
-            'event' : event,
-            'revenue' : revenue,
-            'attendees' : attendees,
-        })
+            return render(request, 'organizer_eventdetails.html', {
+                'event' : event,
+                'revenue' : revenue,
+                'attendees' : attendees,
+            })
+        else:
+            return redirect('users:home')
+
+    else:
+        return redirect('users:home')
