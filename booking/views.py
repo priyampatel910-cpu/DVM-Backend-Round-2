@@ -5,15 +5,16 @@ from django.db import transaction
 # Create your views here.
 
 def events_index(request):
-    events = Event.objects.all()
     if not request.user.is_authenticated:
         return redirect('users:login')
+
+    events = Event.objects.only("id", "category", "name", "datetime", "venue", "ticketprice")
+
     return render(request, 'eventlist.html', {
         'events' : events,
     })
 
 def events_book(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
     user = request.user
 
     if not user.is_authenticated:
@@ -21,13 +22,13 @@ def events_book(request, event_id):
     
     if request.method == "POST":
         with transaction.atomic():
-            selected_event = Event.objects.select_for_update().get(id=event.id)
+            event = Event.objects.filter(pk=event_id).select_related("organizer").select_for_update(of=(self, ))
 
             is_already_booked = selected_event.audience.filter(id=user.id).exists()
 
             if is_already_booked:
                 return render(request, 'events_book.html',{
-                    'is_already_booked' : is_already_booked,
+                    'is_already_booked' : True,
                     'event' : event,
                 })
             
@@ -43,17 +44,20 @@ def events_book(request, event_id):
                     'event' : event,
                 })
 
-            user.balance -= selected_event.ticketprice
-            selected_event.booked_slots += 1
-            user.save(update_fields=['balance'])
+            balance_updated = User.objects.filter(pk=user.pk, balance__gte=event.ticketprice).update(balance=F("balance" - event.ticketprice))
+            
+            event.booked_slots += 1
+            event.save(update_fields=['booked_slots'])
 
-            selected_event.audience.add(user)
-            selected_event.save(update_fields=['booked_slots'])
-
+            event.audience.add(user)
+            
             Booking.objects.create(user=user, event=event)
+            
             Transaction.objects.create(user=user, description=selected_event.name, change= -selected_event.ticketprice)
 
             return redirect('booking:booking_success')
+
+    event = get_object_or_404(Event.objects.select_related("organizer"), pk = event_id)
 
     return render(request, 'events_book.html', {
         'event' : event
