@@ -17,6 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+admin.site.site_header = "Evently Admin Panel"
+admin.site.site_title = "Admin - Evently"
+admin.site.index_title = "Welcome to Admin panel!"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('users.urls')),
