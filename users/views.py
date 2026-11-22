@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
 from booking.models import *
+from .models import User
+from django.db.models import F
 from django.db import transaction
 
 def login_view(request):
@@ -33,7 +35,7 @@ def signup_view(request):
         else:
             form = CustomUserCreationForm()
             return render(request, 'signup.html', {
-                'error_msg' : "Invalid Details! Try again.",
+                'error_msg' : 'Invalid Details! Try again.',
                 'form' : form,
             })
         
@@ -47,7 +49,10 @@ def signup_view(request):
 def home(request):
     if request.user.is_authenticated:
         if request.user.is_organizer:
-            organizer_events = request.user.organized_events.only("name", "ticketprice")
+            organizer_events = request.user.organized_events.only(
+                'name',
+                'ticketprice'
+            )
             return render(request, 'organizer_homepage.html', {
                 'events' : organizer_events,
             })
@@ -75,22 +80,23 @@ def addmoney(request):
     if request.method == "POST":
         added_balance = (int)(request.POST['added_balance'])
 
-        with transaction.atomic():
-            selected_user = User.objects.select_for_update().get(id=request.user.id)
-
-            if added_balance<=0:
+        if added_balance<=0:
                 return render(request, 'addmoney.html',{
-                    'error_msg' : "Error: You must add a valid balance to proceed"
+                    'error_msg' : 'Error: You must add a valid balance to proceed'
                 })
 
-            selected_user.balance += added_balance
-            selected_user.save(update_fields=['balance'])
+        with transaction.atomic():
+            User.objects.filter(pk=request.user.pk).update(balance = F('balance') + added_balance)    
 
-            Transaction.objects.create(user=request.user, description="Added to wallet", change=added_balance)
+            Transaction.objects.create(
+                user=request.user,
+                description="Added to wallet",
+                change=added_balance
+            )
 
-            return render(request, 'addmoney_successpage.html', {
-                'added_balance' : added_balance
-            })
+        return render(request, 'addmoney_successpage.html', {
+            'added_balance' : added_balance
+        })
 
     return render(request, 'addmoney.html')
 
@@ -99,8 +105,20 @@ def mybookings(request):
     if not request.user.is_authenticated:
         return redirect('users:login')
 
-    transactions = Transaction.objects.filter(user=request.user)
-    bookings = Booking.objects.filter(user=request.user)
+    transactions = Transaction.objects.filter(user=request.user).only(
+        'transaction_at',
+        'description',
+        'change'
+    )
+    bookings = Booking.objects.filter(user=request.user).select_related('event').only(
+        'id',
+        'booked_at',
+        'event__category',
+        'event__name',
+        'event__datetime',
+        'event__venue',
+        'event__ticketprice',
+    )
 
     return render(request, 'viewbookings.html', {
         'transactions' : transactions,
@@ -108,56 +126,47 @@ def mybookings(request):
     })
 
 def organizer_addevent(request):
-    if request.user.is_authenticated:
-        if request.user.is_organizer:
-            if request.method == "POST":
-                form = EventCreateForm(request.POST)
-                
-                if form.is_valid:
-                    event = form.save(commit = False)
-                    event.organizer = request.user
-                    form.save()
-                    return redirect('users:home')
-                
-                else:
-                    form = EventCreateForm()
-                    return render(request, 'organizer_addevent.html', {
-                        'form' : form,
-                        "error_msg" : "Invalid details. Try again",
-                    })
+    if not request.user.is_authenticated or not request.user.is_organizer:
+        return redirect('users:home')
 
-            else:
-                form = EventCreateForm()
-
-            return render(request, 'organizer_addevent.html',{
+    if request.method == "POST":
+        form = EventCreateForm(request.POST)
+                
+        if form.is_valid():
+            event = form.save(commit = False)
+            event.organizer = request.user
+            form.save()
+            return redirect('users:home')
+                
+        else:
+            form = EventCreateForm()
+            return render(request, 'organizer_addevent.html', {
                 'form' : form,
+                'error_msg' : 'Invalid details. Try again',
             })
 
-        else:
-            return redirect('users:home')
-
     else:
-        return redirect('users:home')
+        form = EventCreateForm()
+
+        return render(request, 'organizer_addevent.html',{
+            'form' : form,
+        })
 
 def organizer_eventdetails(request, event_id):
-    if request.user.is_authenticated:
-        if request.user.is_organizer:
-            event = get_object_or_404(Event, id=event_id)
-            attendees = event.audience.all()
-
-            for attendee in attendees:
-                booking = attendee.bookings.filter(event=event).first()
-                attendee.current_booking_at = booking.booked_at if booking else None
-
-            revenue = event.booked_slots * event.ticketprice
-
-            return render(request, 'organizer_eventdetails.html', {
-                'event' : event,
-                'revenue' : revenue,
-                'attendees' : attendees,
-            })
-        else:
-            return redirect('users:home')
-
-    else:
+    if not request.user.is_authenticated or not request.user.is_organizer:
         return redirect('users:home')
+
+    event = get_object_or_404(Event, id=event_id)
+    attendees = event.audience.all()
+
+    for attendee in attendees:
+        booking = attendee.bookings.filter(event=event).first()
+        attendee.current_booking_at = booking.booked_at if booking else None
+
+    revenue = event.booked_slots * event.ticketprice
+
+    return render(request, 'organizer_eventdetails.html', {
+        'event' : event,
+        'revenue' : revenue,
+        'attendees' : attendees,
+    })

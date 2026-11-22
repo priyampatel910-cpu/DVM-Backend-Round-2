@@ -24,9 +24,9 @@ def events_book(request, event_id):
     
     if request.method == "POST":
         with transaction.atomic():
-            event = Event.objects.filter(pk=event_id).select_related("organizer").select_for_update(of=(self, ))
+            event = Event.objects.filter(pk=event_id).select_related("organizer").select_for_update(of=('self', )).first()
 
-            is_already_booked = selected_event.audience.filter(id=user.id).exists()
+            is_already_booked = event.audience.filter(id=user.id).exists()
 
             if is_already_booked:
                 return render(request, 'events_book.html',{
