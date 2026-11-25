@@ -156,7 +156,8 @@ def organizer_eventdetails(request, event_id):
     if not request.user.is_authenticated or not request.user.is_organizer:
         return redirect('users:home')
 
-    event = get_object_or_404(Event, id=event_id)
+    event = get_object_or_404(Event, id=event_id, organizer = request.user)
+
     attendees = event.audience.all()
 
     for attendee in attendees:
