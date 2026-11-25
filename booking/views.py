@@ -48,7 +48,7 @@ def events_book(request, event_id):
 
             balance_updated = User.objects.filter(pk=user.pk, balance__gte=event.ticketprice).update(balance=F("balance") - event.ticketprice)
             
-            event.booked_slot = F('booked_slot') + 1
+            event.booked_slot = event.booked_slot + 1
             event.save(update_fields=['booked_slots'])
 
             event.audience.add(user)
