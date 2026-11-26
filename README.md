@@ -131,9 +131,13 @@ You can swap in any other Django command after `uv run`.
 ## Hosting on a VPS
 I have hosted the dockerized application on a VPS, which I obtained from AWS, as I couldn't get free credits from Microsoft Azure even after multiple attempts.
 
-You can visit the web application [here](http://3.27.0.48)
+You can visit the web application [here](http://book.evently.codes)
 
-IP: 3.27.0.48 (Visit as http:// as I have not yet got SSL certificate)
+IP: 3.27.0.48
+Elastic IP: 15.135.45.153
+Domain: [book.evently.codes](http://book.evently.codes)
+
+(Visit as http:// as I have not yet got SSL certificate)
 
 ----------
 

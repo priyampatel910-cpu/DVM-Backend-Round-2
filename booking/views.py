@@ -3,6 +3,7 @@ from .models import *
 from django.db import transaction
 from django.db.models import F
 from users.models import User
+from django.utils import timezone
 
 # Create your views here.
 
@@ -10,7 +11,14 @@ def events_index(request):
     if not request.user.is_authenticated:
         return redirect('users:login')
 
-    events = Event.objects.only("id", "category", "name", "datetime", "venue", "ticketprice")
+    events = Event.objects.filter(datetime__gt=timezone.now()).only(
+        'id',
+        'category',
+        'name',
+        'datetime',
+        'venue',
+        'ticketprice'
+    )
 
     return render(request, 'eventlist.html', {
         'events' : events,
@@ -24,7 +32,7 @@ def events_book(request, event_id):
     
     if request.method == "POST":
         with transaction.atomic():
-            event = Event.objects.filter(pk=event_id).select_related("organizer").select_for_update(of=('self', )).first()
+            event = Event.objects.filter(pk=event_id).select_related('organizer').select_for_update(of=('self', )).first()
 
             is_already_booked = event.audience.filter(id=user.id).exists()
 
@@ -47,11 +55,11 @@ def events_book(request, event_id):
                 })
 
             balance_updated = User.objects.filter(pk=user.pk, balance__gte=event.ticketprice).update(balance=F("balance") - event.ticketprice)
-            
-            event.booked_slots = event.booked_slots + 1
-            event.save(update_fields=['booked_slots'])
+
+            event.booked_slots = F('booked_slots') + 1
 
             event.audience.add(user)
+            event.save()
             
             Booking.objects.create(user=user, event=event)
 
